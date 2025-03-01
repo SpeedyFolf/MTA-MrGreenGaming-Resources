@@ -1,4 +1,10 @@
 # Ignore everything in this directory
 *
-# Except this file
+# But do not ignore the .gitignore file itself
 !.gitignore
+
+# And do not ignore the [CustomChangesForMrGreenGaming] directory
+!\[CustomChangesForMrGreenGaming\]/
+
+# And do not ignore anything inside the [CustomChangesForMrGreenGaming] directory
+!\[CustomChangesForMrGreenGaming\]/**
