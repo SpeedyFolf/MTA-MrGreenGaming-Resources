@@ -93,13 +93,17 @@ function TitleScreen.init()
 	g_dxGUI['titleText1'] = dxText:create('', 30, screenHeight-67, false, 'bankgothic', 0.70, 'left' )
 	g_dxGUI['titleText2'] = dxText:create('', 120, screenHeight-67, false, 'bankgothic', 0.70, 'left' )
 	g_dxGUI['titleText1']:text(	'KEYS: \n' ..
-								'F4 \n' ..
+								'F1 \n' ..
 								'F5 \n' ..
+								'F6 \n' ..
+								'F10 \n' ..
 								'ENTER' )
 	g_dxGUI['titleText2']:text(	'\n' ..
-								'- TRAFFIC ARROWS \n' ..
+								'- SETTINGS \n' ..
 								'- TOP TIMES \n' ..
-								'- RETRY' )
+								'- SHOP \n' ..
+								'- STATS \n' ..
+								'- RESPAWN' )
 	hideGUIComponents('titleImage','titleText1','titleText2')
 end
 
@@ -124,7 +128,7 @@ function TitleScreen.update()
 end
 
 function TitleScreen.getTicksRemaining()
-    return math.max( 0, TitleScreen.startTime - TitleScreen.bringForward + 10000 - getTickCount() )
+    return math.max( 0, TitleScreen.startTime - TitleScreen.bringForward + 20000 - getTickCount() )
 end
 
 -- Start the fadeout as soon as possible
