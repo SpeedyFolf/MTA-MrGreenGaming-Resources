@@ -14,6 +14,18 @@ modes = {
 math.randomseed( getTickCount() % 50000 )
 currentmode = math.random(#modes)
 
+-- get custom forced gamemode for happy_moments
+function getHappyMomentGamemode()
+	if getResourceState(getResourceFromName("happy_moments")) == "running" then
+		local gamemode = exports.happy_moments:getHappyMomentArg("gamemode")
+		if gamemode and gamemode ~= "" then
+			return gamemode
+		end
+	end
+	return false
+end
+
+
 --
 -- racemidvote_server.lua
 --
@@ -84,26 +96,33 @@ local minPlayersForVote = 7
 function startMidMapVoteForRandomMap(player)
 	-- Check state and race time left
 	-- if not stateAllowsRandomMapVote() or g_CurrentRaceMode:getTimeRemaining() < 30000 then
+
+	if not player then return false end
 	if not stateAllowsRandomMapVote() then
-		if player then
-			outputRace("It's not possible to vote for a new map currently, " .. getPlayerName(player) .. ".", player)
-		end
+		outputRace("It's not possible to vote for a new map currently, " .. getPlayerName(player) .. ".", player)
 		return
 	end
 
+	local isPlayerStaff = hasObjectPermissionTo ( player, "command.mute" )
+
 	if isCurrentMapPremium then
-		if player then
+		if isPlayerStaff then
+			outputRace("/New is disabled for premium maps, but as a staff member you can still start a vote.", player)
+		else
 			outputRace("Premium maps (bought, event etc.) can't be skipped", player)
+			return
 		end
-		return
 	end
+
 
 	-- Check if there are enough players for non-admins to start the vote
 	if getPlayerCount() > minPlayersForVote then
-		if player then
+		if isPlayerStaff then
+			outputRace("/New is disabled when there are " .. minPlayersForVote + 1 .. " or more players online, but as a staff member you can still start a vote.", player)
+		else
 			outputRace("You can only start a vote when there are " .. minPlayersForVote .. " or fewer players online.", player)
+			return
 		end
-		return
 	end
 
     -- Check if the global cooldown is still active
@@ -113,22 +132,24 @@ function startMidMapVoteForRandomMap(player)
         local remainingMinutes = math.ceil((voteDelay - timeElapsed) / 60)
         local timeMessage = remainingMinutes > 1 and "minutes" or "minute"
 
-        if player then
-            outputRace("You must wait " .. remainingMinutes .. " " .. timeMessage .. " before starting a new vote.", player)
+        if isPlayerStaff then
+					outputRace("/New is in cooldown, but as a staff member you can still start a vote.", player)
+				else
+					outputRace("You must wait " .. remainingMinutes .. " " .. timeMessage .. " before starting a new vote.", player)
+					return
         end
-        return
     end
 
-    -- Record the current time as the new global vote time
-    prevVoteTime = getRealTime().timestamp
+  -- Record the current time as the new global vote time
+  prevVoteTime = getRealTime().timestamp
 
 	displayHilariarseMessage(player)
 	exports.votemanager:stopPoll()
 
 	-- Actual vote started here
 	local pollDidStart = exports.votemanager:startPoll {
-		title = 'Start a new map?',
-		percentage = 100,
+		title = 'Start a new (random) map? 75% needs to vote yes to change the map.',
+		percentage = 75,
 		timeout = 20,
 		allowchange = true,
 		visibleTo = getRootElement(),
@@ -182,7 +203,7 @@ function startRandomMap(randomMode)
 
 	-- Get a random map chosen from the 10% of least recently player maps, with enough spawn points for all the players (if required)
 	-- local map = getRandomMapCompatibleWithGamemode( getThisResource(), 10, g_GameOptions.ghostmode and 0 or getTotalPlayerCount() )
-	local map = getRandomMapCompatibleWithGamemode( getThisResource(), 10, g_GameOptions.ghostmode and 0 or getTotalPlayerCount(), false, randomMode and modes[math.random(#modes)] or modes[currentmode] )
+	local map = getRandomMapCompatibleWithGamemode( getThisResource(), 10, g_GameOptions.ghostmode and 0 or getTotalPlayerCount(), false, getHappyMomentGamemode() or randomMode and modes[math.random(#modes)] or modes[currentmode] )
 	if map then
 		g_IgnoreSpawnCountProblems = map	-- Uber hack 4000
 		if not exports.mapmanager:changeGamemodeMap ( map, nil, true ) then
@@ -457,9 +478,9 @@ function calculateNextmap()
 
 	local compatibleMaps
 	if respectCycle then
-		compatibleMaps = getRandomMapCompatibleWithGamemode( getThisResource(), 1, 0, false, modes[currentmode] )
+		compatibleMaps = getRandomMapCompatibleWithGamemode( getThisResource(), 1, 0, false, getHappyMomentGamemode() or modes[currentmode] )
 	else
-		compatibleMaps = getRandomMapCompatibleWithGamemode( getThisResource(), 1, 0, false, modes[math.random(#modes)])
+		compatibleMaps = getRandomMapCompatibleWithGamemode( getThisResource(), 1, 0, false, getHappyMomentGamemode() or modes[math.random(#modes)])
 	end
 
 	if compatibleMaps then

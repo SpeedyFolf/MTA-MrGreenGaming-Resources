@@ -725,7 +725,7 @@ addEventHandler('onPlayerReachCheckpointInternal', g_Root,
 		if checkpoint.vehicle then
 			if getElementModel(vehicle) ~= tonumber(checkpoint.vehicle) then
 				if checkpointNum < #g_Checkpoints then
-					clientCall(source, 'alignVehicleWithUp')
+					clientCall(source, 'alignVehicleWithUp', g_MapOptions.classicchangez)
 				end
 				setVehicleID(vehicle, checkpoint.vehicle)
 				if nitroLevel then
@@ -875,8 +875,11 @@ addEventHandler('onGamemodeMapStop', g_Root,
 		for i,player in ipairs(getElementsByType"player") do
 			setElementData ( player, "race rank", "" )
 			setElementData ( player, "checkpoint", "" )
+
+			if not getPlayerSerial(player) == "908E74ADB095BBFF84E0C295A98DBD74" then
+        fadeCamera ( player, false, 0.0, 0,0, 0 )
+			end
 		end
-        fadeCamera ( g_RootPlayers, false, 0.0, 0,0, 0 )
         gotoState('NoMap')
 		unloadAll()
 	end
@@ -921,7 +924,7 @@ addEventHandler('onGamemodeStart', g_ResRoot,
 
 function addRaceScoreboardColumns()
 	exports.scoreboard:scoreboardAddColumn("race rank", root, 40, "Rank", 4)
-	exports.scoreboard:scoreboardAddColumn("checkpoint", root, 77, "Checkpoint", 5)
+	exports.scoreboard:scoreboardAddColumn("checkpoint", root, 40, "Checkpoint", 5)
 	exports.scoreboard:scoreboardAddColumn("player state", root, 60, "State", 9)
 	setTimer ( function() exports.scoreboard:scoreboardSetSortBy("race rank") end, 2000, 1 )
 end
@@ -1580,17 +1583,17 @@ function export_setPlayerVehicle(player,vehicleID) -- Used in gc perk: reroll ve
 
 
 		local isset = setVehicleID(vehicle, vehicleID)
-		local notifyClient = clientCall(player, 'vehicleChanging', g_MapOptions.classicchangez, vehicleID)
-
+		
 		if nitrous and nitrous[2] then
 			addVehicleUpgrade(vehicle, 1010)
 			clientCall(root, 'setVehicleNitroLevel', vehicle, nitrous[2])
-
+			
 			if nitrous[1] then
 				clientCall(root, 'setVehicleNitroActivated', vehicle, true)
 			end
 		end
-
+		clientCall(player, 'vehicleChanging', g_MapOptions.classicchangez, vehicleID)
+		
 		return not not isset
 	end
 end

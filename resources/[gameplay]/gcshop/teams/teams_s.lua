@@ -222,54 +222,69 @@ function checkPlayerTeam(player, bLogin)
 end
 
 function sendClientData(nicks, res, player, r)
-	local result = res
-	local fid
-	local c = false
-	local forumNameTable = {}
-	for i, row in ipairs(result) do
-		fid = row.forumid
+    local result = res
+    local forumNameTable = {}
 
-		if nicks then
-			for j, ro in ipairs(nicks) do
-				if row.forumid == ro.forumid then
-					row.mta_name = ro.name:gsub("#%x%x%x%x%x%x", "")
-					c = true
-					break
-				end
-			end
-		end
+    if nicks then
+        local forumIdToName = {}
+        local nicksCount = #nicks
+        for i = 1, nicksCount do
+            local ro = nicks[i]
+            forumIdToName[ro.forumid] = ro.name:gsub("#%x%x%x%x%x%x", "")
+        end
 
-		if not c then
-			table.insert(forumNameTable, {userId=fid})
-		end
-		c = false
-	end
+        local resultCount = #result
+        for i = 1, resultCount do
+            local row = result[i]
+            local name = forumIdToName[row.forumid]
+            if name then
+                row.mta_name = name
+            else
+                forumNameTable[#forumNameTable + 1] = { userId = row.forumid }
+            end
+        end
+    else
+        local resultCount = #result
+        for i = 1, resultCount do
+            forumNameTable[#forumNameTable + 1] = { userId = result[i].forumid }
+        end
+    end
 
-	if #forumNameTable > 0 then
-		exports.gc:getForumAccountDetailsMultiple(forumNameTable, result, r, player, 'getForumDetails')
-	else
-		triggerClientEvent('teamsData', resourceRoot, result, player, r)
-	end
+    if #forumNameTable > 0 then
+        exports.gc:getForumAccountDetailsMultiple(forumNameTable, result, r, player, 'getForumDetails')
+    else
+        triggerClientEvent('teamsData', resourceRoot, result, player, r)
+    end
 end
+
 
 addEvent('getForumDetails')
 addEventHandler('getForumDetails', root,
 function(resp, res, r, player)
-	local result = res
-	if not resp then
-		triggerClientEvent('teamsData', resourceRoot, result, player, r)
-	else
-		for _, p in ipairs(resp) do
-			for _, row in ipairs(result) do
-				if row.forumid == p.forumid then
-					row.mta_name = p.name
-					break
-				end
-			end
-		end
-		triggerClientEvent('teamsData', resourceRoot, result, player, r)
-	end
+    local result = res
+    if not resp then
+        triggerClientEvent('teamsData', resourceRoot, result, player, r)
+    else
+        local forumIdToName = {}
+        local respCount = #resp
+        for i = 1, respCount do
+            local p = resp[i]
+            forumIdToName[p.forumid] = p.name
+        end
+
+        local resultCount = #result
+        for i = 1, resultCount do
+            local row = result[i]
+            local name = forumIdToName[row.forumid]
+            if name then
+                row.mta_name = name
+            end
+        end
+
+        triggerClientEvent('teamsData', resourceRoot, result, player, r)
+    end
 end)
+
 
 function checkPlayerTeam2(qh, player, bLogin)
     local result = dbPoll(qh, 0)
