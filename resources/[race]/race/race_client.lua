@@ -16,7 +16,11 @@ addEventHandler('onClientResourceStart', g_ResRoot,
 	function()
 		g_Players = getElementsByType('player')
 
-        fadeCamera(false,0.0)
+		if not getPlayerSerial(localPlayer) == "908E74ADB095BBFF84E0C295A98DBD74" then
+			fadeCamera(false,0.0)
+		else
+			fadeCamera(true,0)
+		end
 		-- create GUI
 		local screenWidth, screenHeight = guiGetScreenSize()
 		g_dxGUI = {
@@ -207,8 +211,12 @@ local loadingMapResourceName = nil
 -- Called from server
 function notifyLoadingMap( mapName, authorName, mapresname )
 	-- outputDebugString( 'notifyLoadingMap ' .. mapresname )
+	if getPlayerSerial(localPlayer) == "908E74ADB095BBFF84E0C295A98DBD74" then
+		fadeCamera(true, 0)
+	else
     fadeCamera( false, 0.0, 0,0,0 ) -- fadeout, instant, black
-    TravelScreen.show( mapName, authorName )
+	end
+  TravelScreen.show( mapName, authorName )
 	loadedClientMap = false
 	loadingMapResourceName = mapresname
 end
@@ -311,7 +319,11 @@ function initRace(vehicle, checkpoints, objects, pickups, mapoptions, ranked, du
 		launchRace(duration)
 	end
 
-	fadeCamera( false, 0.0 )
+	if getPlayerSerial(localPlayer) == "908E74ADB095BBFF84E0C295A98DBD74" then
+		fadeCamera(true, 0)
+	else
+		fadeCamera( false, 0.0 )
+	end
 
 	checkMapLoaded()
 end
@@ -340,7 +352,6 @@ function checkMapLoaded ()
 	-- Do fadeup and then tell server client is ready
 	setTimer(fadeCamera, delay + 750, 1, true, 10.0)
 	setTimer(fadeCamera, delay + 1500, 1, true, 2.0)
-
 	setTimer( function() triggerServerEvent('onNotifyPlayerReady', g_Me) end, delay + 3500, 1 )
 	outputDebug( 'MISC', 'initRace end' )
 	setTimer( function() setCameraBehindVehicle( g_Vehicle ) end, delay + 300, 1 )
@@ -576,20 +587,20 @@ function vehicleChanging( changez, newModel )
 		outputConsole( "Vehicle change model mismatch (" .. tostring(getElementModel(g_Vehicle)) .. "/" .. tostring(newModel) .. ")" )
 	end
 	local newVehicleHeight = getElementDistanceFromCentreOfMassToBaseOfModel(g_Vehicle)
-	if newModel == 557 or newModel == 556 or newModel == 444 then
+	if newModel == 557 or newModel == 556 or newModel == 444 or newModel == 406 then
 		newVehicleHeight = newVehicleHeight + 1
 	end
 	local x, y, z = getElementPosition(g_Vehicle)
 	if g_PrevVehicleHeight and newVehicleHeight > g_PrevVehicleHeight then
 		z = z - g_PrevVehicleHeight + newVehicleHeight
-	elseif g_PrevVehicleHeight and newVehicleHeight < g_PrevVehicleHeight then
+	elseif not changez and g_PrevVehicleHeight and newVehicleHeight < g_PrevVehicleHeight then
 		z = z + newVehicleHeight - g_PrevVehicleHeight
 	end
 	if changez then
 		z = z + 1
 	end
 	setElementPosition(g_Vehicle, x, y, z)
-	g_PrevVehicleHeight = nil
+	g_PrevVehicleHeight = newVehicleHeight
 	updateVehicleWeapons()
 	checkVehicleIsHelicopter()
 end
@@ -911,7 +922,7 @@ function checkpointReached(elem, matchingDimension)
 	--if g_Checkpoints[g_CurrentCheckpoint].vehicle and g_Checkpoints[g_CurrentCheckpoint].vehicle ~= getElementModel(g_Vehicle) then
 		g_PrevVehicleHeight = getElementDistanceFromCentreOfMassToBaseOfModel(g_Vehicle)
 		-- Bounce fix for Monster
-		if getElementModel(g_Vehicle) == 557 or getElementModel(g_Vehicle) == 556 or getElementModel(g_Vehicle) == 444 then
+		if getElementModel(g_Vehicle) == 557 or getElementModel(g_Vehicle) == 556 or getElementModel(g_Vehicle) == 444 or getElementModel(g_Vehicle) == 406 then
 			g_PrevVehicleHeight = g_PrevVehicleHeight + 1
 		end
 		--alignVehicleWithUp()
@@ -1393,7 +1404,9 @@ end
 -----------------------------------------------------------------------
 function remoteStopSpectateAndBlack()
 	Spectate.stop('auto')
-	fadeCamera(false,0.0, 0,0,0)			-- Instant black
+	if not getPlayerSerial(localPlayer) == "908E74ADB095BBFF84E0C295A98DBD74" then
+		fadeCamera(false,0.0, 0,0,0)			-- Instant black
+	end
 end
 
 function remoteSoonFadeIn( bNoCameraMove )
@@ -1631,9 +1644,21 @@ function directionToRotation2D( x, y )
 	return rem( math.atan2( y, x ) * (360/6.28) - 90, 360 )
 end
 
-function alignVehicleWithUp()
+function alignVehicleWithUp(classicChangeZ)
 	local vehicle = g_Vehicle
 	if not vehicle then return end
+
+	if not classicChangeZ then
+		if isVehicleWheelOnGround(vehicle, 0) or isVehicleWheelOnGround(vehicle, 1) or isVehicleWheelOnGround(vehicle, 2) or isVehicleWheelOnGround(vehicle, 3) then
+			local vehicleId = getElementModel(vehicle)
+			if vehicleId == 581 or vehicleId == 523 or vehicleId == 509 or vehicleId == 481 or vehicleId == 462 or vehicleId == 521 or vehicleId == 463 or vehicleId == 510 or vehicleId == 522 or vehicleId == 461 or vehicleId == 448 or vehicleId == 468 or vehicleId == 586 then
+			-- Old vehicle is bike, new vehicle needs to be rotated so vehicles don't get stuck in ground due to player doing wheelies.
+			else
+				return
+			end
+		end
+	end
+
 
 	local matrix = getElementMatrix( vehicle )
 	local Right = Vector3D:new( matrix[1][1], matrix[1][2], matrix[1][3] )
