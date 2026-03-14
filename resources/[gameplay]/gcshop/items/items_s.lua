@@ -749,6 +749,8 @@ function changeSpawn (player)
 	newSpawnpoint = allSpawnpoints[spawnIndex[player]]
 	x, y, z, id, vehID, rot = getSpawnpointPosition(newSpawnpoint)
 
+	outputChatBox("Changed to spawn " .. spawnIndex[player] .. "/" .. #allSpawnpoints, player, 0, 255, 0)
+
 	setElementPosition(veh, x,y,z)
 	setElementRotation(veh, 0,0,rot)
 	setElementModel(veh, vehID)
