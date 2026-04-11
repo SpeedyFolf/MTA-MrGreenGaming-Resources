@@ -384,8 +384,8 @@ addEventHandler("onPlayerFinish", root, function(rank, time)
 			nBeatenGhosts = nBeatenGhosts + 1
 		end
 	end
-	outputChatBox("You beat " .. nBeatenGhosts .. " ghost(s) on this map and earned " .. nBeatenGhosts .. " bonus GC!", root, 255, 255, 0)
-	exports.gc:addPlayerGreenCoins(root, nBeatenGhosts)
+	outputChatBox("You beat " .. nBeatenGhosts .. " ghost(s) on this map and earned " .. nBeatenGhosts .. " bonus GC!", source, 255, 255, 0)
+	exports.gc:addPlayerGreenCoins(source, nBeatenGhosts)
 end)
 
 addEvent("onClientRequestPBGhost", true)
