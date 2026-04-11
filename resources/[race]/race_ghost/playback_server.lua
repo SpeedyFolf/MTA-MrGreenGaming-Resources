@@ -377,15 +377,15 @@ addEventHandler( "onMapStarting", root,
 )
 
 -- Reward player with 1 GC per defeated ghost
-addEventHandler("onPlayerFinish", root, function(player, time)
+addEventHandler("onPlayerFinish", root, function(rank, time)
 	local nBeatenGhosts = 0
 	for _, ghostTime in pairs(GhostTimes) do
 		if time < ghostTime then
 			nBeatenGhosts = nBeatenGhosts + 1
 		end
 	end
-	outputChatBox("You beat " .. nBeatenGhosts .. " ghost(s) on this map and earned " .. nBeatenGhosts .. " bonus GC!", player, 255, 255, 0)
-	exports.gc:addPlayerGreenCoins(player, nBeatenGhosts)
+	outputChatBox("You beat " .. nBeatenGhosts .. " ghost(s) on this map and earned " .. nBeatenGhosts .. " bonus GC!", root, 255, 255, 0)
+	exports.gc:addPlayerGreenCoins(root, nBeatenGhosts)
 end)
 
 addEvent("onClientRequestPBGhost", true)
