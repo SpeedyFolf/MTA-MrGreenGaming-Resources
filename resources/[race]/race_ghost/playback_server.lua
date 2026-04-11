@@ -7,6 +7,7 @@ GhostPlayback.__index = GhostPlayback
 GhostFileNames = {}
 GhostFileNamesCount = 0
 UsedGhosts = {}
+GhostTimes = {}
 TopPlayback = nil
 
 function GhostPlayback:create( map )
@@ -107,6 +108,7 @@ function GhostPlayback:loadGhost(ghostResourceName, mapName)
 
 		self.racer = json.racer
 		self.bestTime = tonumber(json.bestTime) or math.huge
+		table.insert(GhostTimes, self.bestTime)
 		self.recording = json.recording
 
 		-- Validate
@@ -183,6 +185,7 @@ function GhostPlayback:loadGhost_Legacy(ghostResourceName, mapName)
 		if info then
 			self.racer = xmlNodeGetAttribute( info, "r" ) or "unknown"
 			self.bestTime = tonumber( xmlNodeGetAttribute( info, "t" ) ) or math.huge
+			table.insert(GhostTimes, self.bestTime)
 		end
 		-- Construct a table
 		local index = 0
@@ -279,6 +282,7 @@ addEventHandler( "onMapStarting", root,
 		GhostPlayers = 0
 		ReportedPlayers = 0
 		TotalPlayers = #getElementsByType("player")
+		GhostTimes = {}
 
 		if TopPlayback then
 			TopPlayback:destroy()
@@ -371,6 +375,18 @@ addEventHandler( "onMapStarting", root,
 		tickCount = tickCount2
 	end
 )
+
+-- Reward player with 1 GC per defeated ghost
+addEventHandler("onPlayerFinish", root, function(player, time)
+	local nBeatenGhosts = 0
+	for _, ghostTime in pairs(GhostTimes) do
+		if time < ghostTime then
+			nBeatenGhosts = nBeatenGhosts + 1
+		end
+	end
+	outputChatBox("You beat " .. nBeatenGhosts .. " ghost(s) on this map and earned " .. nBeatenGhosts .. " bonus GC!", player, 255, 255, 0)
+	exports.gc:addPlayerGreenCoins(player, nBeatenGhosts)
+end)
 
 addEvent("onClientRequestPBGhost", true)
 addEventHandler( "onClientRequestPBGhost", root, 
