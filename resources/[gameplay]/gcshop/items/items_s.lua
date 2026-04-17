@@ -712,7 +712,7 @@ function changeSpawn(player)
 	if not veh then return end
 
 	if not spawnIndex[player] then
-		spawnIndex[player] = 1
+		spawnIndex[player] = #allSpawnpoints
 	end
 
 	local direction = getShiftState(player) and -1 or 1
