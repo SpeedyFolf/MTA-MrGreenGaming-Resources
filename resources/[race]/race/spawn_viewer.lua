@@ -1,21 +1,25 @@
 local spawnObjects = {}
 local timer = nil
 
+local function cleanup()
+	for _, obj in ipairs(spawnObjects) do
+		if isElement(obj) then
+			destroyElement(obj)
+		end
+	end
+	spawnObjects = {}
+	if timer and isTimer(timer) then
+		killTimer(timer)
+	end
+end
+
 addEvent("onRaceStateChanging", true)
 addEventHandler("onRaceStateChanging", root, function(newState)
 	if newState == "Running" then
-		for _, obj in ipairs(spawnObjects) do
-			if isElement(obj) then
-				destroyElement(obj)
-			end
-		end
-		spawnObjects = {}
-		if timer and isTimer(timer) then
-			killTimer(timer)
-		end
+		cleanup()
 	end
-
 	if newState == "PreGridCountdown" then
+		cleanup()
 		local spawnpoints = getElementsByType('spawnpoint',
 			getResourceRootElement(exports.mapmanager:getRunningGamemodeMap()))
 
