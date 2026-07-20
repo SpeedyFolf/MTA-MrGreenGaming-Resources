@@ -5,7 +5,7 @@
 	<script src='newCamera.lua' type='client' />
 	<script src="onClientVehicleExplode.lua" type="client" />
 	<script src="onVehicleExplode.lua" type="server" />
-	
+
 	<!-- <file src="fixedvehicles/admiral.dff" />
 	<file src="fixedvehicles/ambulan.dff" />
 	<file src="fixedvehicles/artict1.dff" />
@@ -23,7 +23,8 @@
 	<file src="fixedvehicles/copcarvg.dff" /> -->
 	<file src="fixedvehicles/dft30.dff" />
 	<!-- <file src="fixedvehicles/dodo.dff" />
-	<file src="fixedvehicles/dodo.txd" /> -->
+	<file src="fixedvehicles/dodo.txd" />
+	<file src="fixedvehicles/dumper.dff" /> -->
 	<file src="fixedvehicles/duneride.dff" />
 	<file src="fixedvehicles/duneride.txd" />
 	<file src="fixedvehicles/elegy.txd" />
@@ -58,6 +59,7 @@
 	<file src="fixedvehicles/peren.dff" />
 	<!-- <file src="fixedvehicles/phoenix.dff" />
 	<file src="fixedvehicles/polmav.dff" />
+	<file src="fixedvehicles/predator.dff" />
 	<file src="fixedvehicles/premier.dff" />
 	<file src="fixedvehicles/previon.dff" />
 	<file src="fixedvehicles/primo.dff" />
@@ -87,6 +89,7 @@
 	<!-- <file src="fixedvehicles/supergt.dff" /> -->
 	<!-- <file src="fixedvehicles/sweeper.dff" />
 	<file src="fixedvehicles/tornado.dff" />
+	<file src="fixedvehicles/tropic.dff" />
 	<file src="fixedvehicles/tug.dff" /> -->
 	<!-- <file src="fixedvehicles/tugstair.dff" /> -->
 	<file src="fixedvehicles/turismo.dff" />
@@ -99,7 +102,7 @@
 	<!-- <info name="object_light_fix" version="0.0.1" author="Ren712" type="script" /> -->
 	<script src="c_light_disable.lua" type="client" />
 	<file src="light_disable.fx" type="client" />
-    
+
     <!-- <info author="FloW" name="Bridge Fix" description="http://clan-mgc.com/" version="1.0.0" type="misc"/> -->
     <script src="bridgefix.lua" type="client" />
     <file src="countrye_3.col" />
